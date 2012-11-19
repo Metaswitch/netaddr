@@ -97,9 +97,9 @@ class OUI(BaseIdentifier):
         self.records = []
 
         if isinstance(oui, str):
-            #TODO: Improve string parsing here.
-            #TODO: Accept full MAC/EUI-48 addressses as well as XX-XX-XX
-            #TODO: and just take /16 (see IAB for details)
+            # TODO: Improve string parsing here.
+            # TODO: Accept full MAC/EUI-48 addressses as well as XX-XX-XX
+            # TODO: and just take /16 (see IAB for details)
             self._value = int(oui.replace('-', ''), 16)
         elif _is_int(oui):
             if 0 <= oui <= 0xffffff:
@@ -248,9 +248,9 @@ class IAB(BaseIdentifier):
         }
 
         if isinstance(iab, str):
-            #TODO: Improve string parsing here.
-            #TODO: '00-50-C2' is actually invalid.
-            #TODO: Should be '00-50-C2-00-00-00' (i.e. a full MAC/EUI-48)
+            # TODO: Improve string parsing here.
+            # TODO: '00-50-C2' is actually invalid.
+            # TODO: Should be '00-50-C2-00-00-00' (i.e. a full MAC/EUI-48)
             int_val = int(iab.replace('-', ''), 16)
             (iab_int, user_int) = IAB.split_iab_mac(int_val, strict)
             self._value = iab_int
@@ -611,6 +611,15 @@ class EUI(BaseIdentifier):
         """The value of this EUI address as a packed binary string."""
         return self._module.int_to_packed(self._value)
 
+    @classmethod
+    def unpack(cls, packed):
+        if len(packed) == 6:
+            # 48-bit
+            return cls(_eui48.packed_to_int(packed), version=48)
+        elif len(packed) == 8:
+            # 64-bit
+            return cls(_eui64.packed_to_int(packed), version=64)
+
     @property
     def words(self):
         """A list of unsigned integer octets found in this EUI address."""
@@ -658,7 +667,7 @@ class EUI(BaseIdentifier):
             int_val += int(''.join(eui64_tokens), 16)
         else:
             int_val += self._value
-        
+
         # Modified EUI-64 format interface identifiers are formed by inverting
         # the "u" bit (universal/local bit in IEEE EUI-64 terminology) when
         # forming the interface identifier from IEEE EUI-64 identifiers.  In
