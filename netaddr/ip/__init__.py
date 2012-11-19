@@ -490,6 +490,16 @@ class IPAddress(BaseIP):
         """The value of this IP address as a packed binary string."""
         return self._module.int_to_packed(self._value)
 
+    @classmethod
+    def unpack(cls, packed):
+        if len(packed) == (_ipv4.width / 8):
+            return cls(_ipv4.packed_to_int(packed))
+        elif len(packed) == (_ipv6.width / 8):
+            return cls(_ipv6.packed_to_int(packed))
+        else:
+            raise AddrFormatError("Length of packed value %r not IPV4 or IPV6" %
+                                  packed)
+
     @property
     def words(self):
         """
